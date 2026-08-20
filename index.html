@@ -1,36 +1,830 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Esteban: Cuenta Regresiva</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',sans-serif;min-height:100vh;background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.55)),url('bariloche.jpg');background-size:cover;background-position:center;display:flex;justify-content:center;align-items:center;color:#fff}
-.card{width:95%;max-width:1000px;background:rgba(0,0,0,.35);backdrop-filter:blur(12px);border-radius:25px;padding:40px;text-align:center;border:1px solid rgba(255,255,255,.15)}
-h1{font-size:3rem;margin-bottom:10px;text-shadow:2px 2px 8px rgba(0,0,0,.8)}
-.subtitulo{font-size:1.2rem;margin-bottom:25px;color:#dbeafe}
-.info{margin:10px 0;font-size:1.1rem}.contador{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:30px}.box{width:150px;background:rgba(255,255,255,.15);border-radius:20px;padding:20px}.valor{font-size:4rem;font-weight:bold;color:#38bdf8}.label{margin-top:10px}.resumen{margin-top:25px;font-size:1.3rem;font-weight:bold;color:#4ade80}@media(max-width:768px){h1{font-size:2rem}.box{width:120px}.valor{font-size:3rem}}
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>Agenda de Cumpleaños</title>
+
+    <style>
+        :root {
+            --color-principal: #38bdf8;
+            --color-secundario: #4ade80;
+            --color-alerta: #facc15;
+            --color-urgente: #fb7185;
+            --color-texto: #ffffff;
+            --color-texto-suave: #dbeafe;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: #0f172a;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            color: var(--color-texto);
+
+            background:
+                linear-gradient(
+                    rgba(0, 0, 0, 0.42),
+                    rgba(0, 0, 0, 0.62)
+                ),
+                url("./bariloche.jpg");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            padding:
+                max(24px, env(safe-area-inset-top))
+                max(16px, env(safe-area-inset-right))
+                max(24px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .encabezado {
+            text-align: center;
+            margin-bottom: 28px;
+            padding: 30px 20px;
+
+            background: rgba(15, 23, 42, 0.58);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 26px;
+
+            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+
+            box-shadow: 0 16px 45px rgba(0, 0, 0, 0.34);
+        }
+
+        .encabezado h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            line-height: 1.1;
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .subtitulo {
+            margin-top: 12px;
+            color: var(--color-texto-suave);
+            font-size: clamp(1rem, 3vw, 1.25rem);
+        }
+
+        .fecha-actual {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 11px 18px;
+
+            background: rgba(255, 255, 255, 0.13);
+            border-radius: 999px;
+
+            font-size: 0.98rem;
+            font-weight: 600;
+        }
+
+        .proximo-evento {
+            margin-top: 18px;
+            color: #bbf7d0;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .agenda {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(min(100%, 330px), 1fr)
+            );
+            gap: 22px;
+        }
+
+        .tarjeta {
+            position: relative;
+            overflow: hidden;
+
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 24px;
+
+            padding: 25px;
+
+            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+
+            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35);
+
+            transition:
+                transform 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .tarjeta:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.65);
+        }
+
+        .tarjeta::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--color-principal);
+        }
+
+        .tarjeta.proximo::before {
+            background: var(--color-secundario);
+        }
+
+        .tarjeta.alerta::before {
+            background: var(--color-alerta);
+        }
+
+        .tarjeta.urgente::before,
+        .tarjeta.hoy::before {
+            background: var(--color-urgente);
+        }
+
+        .posicion {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 36px;
+            height: 36px;
+
+            background: rgba(255, 255, 255, 0.13);
+            border-radius: 50%;
+
+            font-weight: 800;
+            color: var(--color-texto-suave);
+        }
+
+        .persona {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-right: 40px;
+        }
+
+        .avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 58px;
+            height: 58px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(56, 189, 248, 0.9),
+                    rgba(37, 99, 235, 0.9)
+                );
+
+            border-radius: 18px;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.25);
+        }
+
+        .nombre {
+            font-size: 1.45rem;
+            line-height: 1.2;
+        }
+
+        .nacimiento {
+            margin-top: 5px;
+            color: #cbd5e1;
+            font-size: 0.92rem;
+        }
+
+        .datos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 23px;
+        }
+
+        .dato {
+            background: rgba(255, 255, 255, 0.09);
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .dato-etiqueta {
+            color: #cbd5e1;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .dato-valor {
+            margin-top: 6px;
+            font-size: 1.07rem;
+            font-weight: 750;
+        }
+
+        .contador {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .contador-unidad {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 12px 5px;
+            text-align: center;
+        }
+
+        .contador-numero {
+            color: var(--color-principal);
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .contador-texto {
+            margin-top: 7px;
+            color: #cbd5e1;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .mensaje {
+            margin-top: 18px;
+            padding: 13px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 700;
+            background: rgba(56, 189, 248, 0.12);
+            color: #bae6fd;
+        }
+
+        .mensaje.hoy {
+            background: rgba(251, 113, 133, 0.18);
+            color: #fecdd3;
+            animation: pulso 1.5s infinite;
+        }
+
+        .sin-datos {
+            grid-column: 1 / -1;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.75);
+        }
+
+        .pie {
+            margin-top: 28px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.85);
+        }
+
+        @keyframes pulso {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.025);
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                background-attachment: scroll;
+            }
+
+            .encabezado {
+                padding: 24px 15px;
+                border-radius: 20px;
+            }
+
+            .tarjeta {
+                padding: 21px 17px;
+                border-radius: 20px;
+            }
+
+            .datos {
+                grid-template-columns: 1fr;
+            }
+
+            .contador {
+                gap: 6px;
+            }
+
+            .contador-unidad {
+                padding: 11px 3px;
+            }
+
+            .contador-texto {
+                font-size: 0.62rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<div class="card">
-<h1>🎿 Esteban: Cuenta Regresiva</h1>
-<div class="subtitulo">Bariloche te espera...</div>
-<div id="fechaActual" class="info"></div>
-<div id="fechaObjetivo" class="info"></div>
-<div class="contador">
-<div class="box"><div id="dias" class="valor">0</div><div class="label">Días</div></div>
-<div class="box"><div id="horas" class="valor">0</div><div class="label">Horas</div></div>
-<div class="box"><div id="minutos" class="valor">0</div><div class="label">Minutos</div></div>
-<div class="box"><div id="segundos" class="valor">0</div><div class="label">Segundos</div></div>
-</div>
-<div id="resumen" class="resumen"></div>
-</div>
-<script>
-function obtenerObjetivo(){const ahora=new Date();let objetivo=new Date(ahora.getFullYear(),7,20,7,0,0);if(objetivo<=ahora){objetivo.setFullYear(ahora.getFullYear()+1)}return objetivo}
-function actualizar(){const ahora=new Date();const objetivo=obtenerObjetivo();const diferencia=objetivo.getTime()-ahora.getTime();const dias=Math.floor(diferencia/86400000);const horas=Math.floor((diferencia%86400000)/3600000);const minutos=Math.floor((diferencia%3600000)/60000);const segundos=Math.floor((diferencia%60000)/1000);document.getElementById('fechaActual').innerHTML='📅 Fecha actual: <b>'+ahora.toLocaleString('es-AR')+'</b>';document.getElementById('fechaObjetivo').innerHTML='🎯 Objetivo: <b>'+objetivo.toLocaleString('es-AR')+'</b>';document.getElementById('dias').innerText=dias;document.getElementById('horas').innerText=horas;document.getElementById('minutos').innerText=minutos;document.getElementById('segundos').innerText=segundos;document.getElementById('resumen').innerHTML=`Faltan ${dias} días, ${horas} horas, ${minutos} minutos y ${segundos} segundos`;}
-actualizar();setInterval(actualizar,1000);
-</script>
+    <main class="contenedor">
+
+        <header class="encabezado">
+            <h1>🎂 Agenda de Cumpleaños</h1>
+
+            <div class="subtitulo">
+                Recordatorio automático de cumpleaños
+            </div>
+
+            <div id="fechaActual" class="fecha-actual">
+                Calculando fecha actual...
+            </div>
+
+            <div id="proximoEvento" class="proximo-evento"></div>
+        </header>
+
+        <section id="agenda" class="agenda"></section>
+
+        <footer class="pie">
+            La información se calcula usando la fecha y hora del dispositivo.
+        </footer>
+
+    </main>
+
+    <script>
+        /*
+         * Para agregar personas nuevas, añade otra entrada:
+         *
+         * {
+         *     nombre: "Nombre Apellido",
+         *     nacimiento: "AAAA-MM-DD"
+         * }
+         *
+         * Usa siempre el formato año-mes-día.
+         */
+
+        const personas = [
+            {
+                nombre: "Pablo Fernando",
+                nacimiento: "1979-11-09"
+            },
+            {
+                nombre: "Ernesto Fabian",
+                nacimiento: "1981-01-31"
+            }
+        ];
+
+        const nombresMeses = [
+            "enero",
+            "febrero",
+            "marzo",
+            "abril",
+            "mayo",
+            "junio",
+            "julio",
+            "agosto",
+            "septiembre",
+            "octubre",
+            "noviembre",
+            "diciembre"
+        ];
+
+        function crearFechaLocal(textoFecha) {
+            const partes = textoFecha.split("-").map(Number);
+
+            return new Date(
+                partes[0],
+                partes[1] - 1,
+                partes[2],
+                0,
+                0,
+                0,
+                0
+            );
+        }
+
+        function formatearFecha(fecha, incluirHora = false) {
+            const opciones = incluirHora
+                ? {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false
+                }
+                : {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                };
+
+            return new Intl.DateTimeFormat("es-AR", opciones).format(fecha);
+        }
+
+        function calcularEdad(nacimiento, ahora) {
+            let edad = ahora.getFullYear() - nacimiento.getFullYear();
+
+            const cumpleañosEsteAño = new Date(
+                ahora.getFullYear(),
+                nacimiento.getMonth(),
+                nacimiento.getDate(),
+                0,
+                0,
+                0,
+                0
+            );
+
+            if (ahora < cumpleañosEsteAño) {
+                edad--;
+            }
+
+            return edad;
+        }
+
+        function obtenerProximoCumple(nacimiento, ahora) {
+            let proximo = new Date(
+                ahora.getFullYear(),
+                nacimiento.getMonth(),
+                nacimiento.getDate(),
+                0,
+                0,
+                0,
+                0
+            );
+
+            /*
+             * Si ya terminó el día del cumpleaños,
+             * se calcula el cumpleaños del año siguiente.
+             */
+
+            const finDelCumpleanos = new Date(
+                ahora.getFullYear(),
+                nacimiento.getMonth(),
+                nacimiento.getDate(),
+                23,
+                59,
+                59,
+                999
+            );
+
+            if (ahora > finDelCumpleanos) {
+                proximo = new Date(
+                    ahora.getFullYear() + 1,
+                    nacimiento.getMonth(),
+                    nacimiento.getDate(),
+                    0,
+                    0,
+                    0,
+                    0
+                );
+            }
+
+            return proximo;
+        }
+
+        function esCumpleanosHoy(nacimiento, ahora) {
+            return (
+                nacimiento.getDate() === ahora.getDate() &&
+                nacimiento.getMonth() === ahora.getMonth()
+            );
+        }
+
+        function calcularTiempoRestante(objetivo, ahora) {
+            const diferencia = Math.max(
+                0,
+                objetivo.getTime() - ahora.getTime()
+            );
+
+            return {
+                total: diferencia,
+                dias: Math.floor(diferencia / 86400000),
+                horas: Math.floor(
+                    (diferencia % 86400000) / 3600000
+                ),
+                minutos: Math.floor(
+                    (diferencia % 3600000) / 60000
+                ),
+                segundos: Math.floor(
+                    (diferencia % 60000) / 1000
+                )
+            };
+        }
+
+        function obtenerClaseProximidad(dias, cumpleHoy, posicion) {
+            if (cumpleHoy) {
+                return "hoy";
+            }
+
+            if (dias <= 7) {
+                return "urgente";
+            }
+
+            if (dias <= 30) {
+                return "alerta";
+            }
+
+            if (posicion === 0) {
+                return "proximo";
+            }
+
+            return "";
+        }
+
+        function obtenerMensaje(dias, cumpleHoy, nombre) {
+            if (cumpleHoy) {
+                return "🎉 ¡Hoy es el cumpleaños de " + nombre + "!";
+            }
+
+            if (dias === 1) {
+                return "🎁 Falta solamente 1 día";
+            }
+
+            if (dias <= 7) {
+                return "🎁 ¡El cumpleaños está muy cerca!";
+            }
+
+            if (dias <= 30) {
+                return "⏰ Conviene preparar el regalo";
+            }
+
+            return "📅 Faltan " + dias + " días";
+        }
+
+        function obtenerDatosPersonas(ahora) {
+            return personas.map(function(persona) {
+                const nacimiento = crearFechaLocal(
+                    persona.nacimiento
+                );
+
+                const cumpleHoy = esCumpleanosHoy(
+                    nacimiento,
+                    ahora
+                );
+
+                const proximoCumple = obtenerProximoCumple(
+                    nacimiento,
+                    ahora
+                );
+
+                const tiempo = calcularTiempoRestante(
+                    proximoCumple,
+                    ahora
+                );
+
+                const edadActual = calcularEdad(
+                    nacimiento,
+                    ahora
+                );
+
+                return {
+                    nombre: persona.nombre,
+                    nacimiento: nacimiento,
+                    cumpleHoy: cumpleHoy,
+                    proximoCumple: proximoCumple,
+                    tiempo: tiempo,
+                    edadActual: edadActual,
+                    edadProxima: edadActual + (cumpleHoy ? 0 : 1)
+                };
+            }).sort(function(a, b) {
+                if (a.cumpleHoy && !b.cumpleHoy) {
+                    return -1;
+                }
+
+                if (!a.cumpleHoy && b.cumpleHoy) {
+                    return 1;
+                }
+
+                return (
+                    a.proximoCumple.getTime() -
+                    b.proximoCumple.getTime()
+                );
+            });
+        }
+
+        function crearTarjeta(datos, posicion) {
+            const clase = obtenerClaseProximidad(
+                datos.tiempo.dias,
+                datos.cumpleHoy,
+                posicion
+            );
+
+            const diaNacimiento = String(
+                datos.nacimiento.getDate()
+            ).padStart(2, "0");
+
+            const mesNacimiento =
+                nombresMeses[datos.nacimiento.getMonth()];
+
+            const fechaNacimiento =
+                diaNacimiento +
+                " de " +
+                mesNacimiento +
+                " de " +
+                datos.nacimiento.getFullYear();
+
+            const mensaje = obtenerMensaje(
+                datos.tiempo.dias,
+                datos.cumpleHoy,
+                datos.nombre
+            );
+
+            const textoEdadProxima = datos.cumpleHoy
+                ? "Edad que cumple hoy"
+                : "Edad que cumplirá";
+
+            return `
+                <article class="tarjeta ${clase}">
+                    <div class="posicion">${posicion + 1}</div>
+
+                    <div class="persona">
+                        <div class="avatar">🎂</div>
+
+                        <div>
+                            <h2 class="nombre">${datos.nombre}</h2>
+
+                            <div class="nacimiento">
+                                Nacimiento: ${fechaNacimiento}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="datos">
+                        <div class="dato">
+                            <div class="dato-etiqueta">
+                                Edad actual
+                            </div>
+
+                            <div class="dato-valor">
+                                ${datos.edadActual} años
+                            </div>
+                        </div>
+
+                        <div class="dato">
+                            <div class="dato-etiqueta">
+                                ${textoEdadProxima}
+                            </div>
+
+                            <div class="dato-valor">
+                                ${datos.edadProxima} años
+                            </div>
+                        </div>
+
+                        <div class="dato">
+                            <div class="dato-etiqueta">
+                                Próximo cumpleaños
+                            </div>
+
+                            <div class="dato-valor">
+                                ${formatearFecha(datos.proximoCumple)}
+                            </div>
+                        </div>
+
+                        <div class="dato">
+                            <div class="dato-etiqueta">
+                                Días restantes
+                            </div>
+
+                            <div class="dato-valor">
+                                ${
+                                    datos.cumpleHoy
+                                        ? "Es hoy"
+                                        : datos.tiempo.dias + " días"
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contador">
+                        <div class="contador-unidad">
+                            <div class="contador-numero">
+                                ${datos.tiempo.dias}
+                            </div>
+                            <div class="contador-texto">Días</div>
+                        </div>
+
+                        <div class="contador-unidad">
+                            <div class="contador-numero">
+                                ${datos.tiempo.horas}
+                            </div>
+                            <div class="contador-texto">Horas</div>
+                        </div>
+
+                        <div class="contador-unidad">
+                            <div class="contador-numero">
+                                ${datos.tiempo.minutos}
+                            </div>
+                            <div class="contador-texto">Minutos</div>
+                        </div>
+
+                        <div class="contador-unidad">
+                            <div class="contador-numero">
+                                ${datos.tiempo.segundos}
+                            </div>
+                            <div class="contador-texto">Segundos</div>
+                        </div>
+                    </div>
+
+                    <div class="mensaje ${
+                        datos.cumpleHoy ? "hoy" : ""
+                    }">
+                        ${mensaje}
+                    </div>
+                </article>
+            `;
+        }
+
+        function actualizarAgenda() {
+            const ahora = new Date();
+
+            document.getElementById("fechaActual").textContent =
+                "📅 Fecha actual: " +
+                formatearFecha(ahora, true);
+
+            const agenda = document.getElementById("agenda");
+
+            if (personas.length === 0) {
+                agenda.innerHTML = `
+                    <div class="sin-datos">
+                        No hay cumpleaños cargados.
+                    </div>
+                `;
+
+                document.getElementById(
+                    "proximoEvento"
+                ).textContent = "";
+
+                return;
+            }
+
+            const datosPersonas = obtenerDatosPersonas(ahora);
+
+            agenda.innerHTML = datosPersonas
+                .map(crearTarjeta)
+                .join("");
+
+            const siguiente = datosPersonas[0];
+
+            if (siguiente.cumpleHoy) {
+                document.getElementById(
+                    "proximoEvento"
+                ).textContent =
+                    "🎉 Hoy cumple años " + siguiente.nombre;
+            } else {
+                document.getElementById(
+                    "proximoEvento"
+                ).textContent =
+                    "🎁 Próximo cumpleaños: " +
+                    siguiente.nombre +
+                    ", dentro de " +
+                    siguiente.tiempo.dias +
+                    (siguiente.tiempo.dias === 1
+                        ? " día"
+                        : " días");
+            }
+        }
+
+        actualizarAgenda();
+
+        setInterval(actualizarAgenda, 1000);
+    </script>
 </body>
 </html>
