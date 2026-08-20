@@ -358,31 +358,6 @@
                 font-size: 0.62rem;
             }
         }
-
-
-        /* Listado estático legible por asistentes y buscadores */
-        .datos-gemini {
-            margin-top: 30px;
-            padding: 25px;
-            background: rgba(15, 23, 42, 0.78);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 24px;
-            -webkit-backdrop-filter: blur(14px);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35);
-        }
-        .datos-gemini h2 { margin-bottom: 8px; color: #4ade80; font-size: clamp(1.35rem, 4vw, 2rem); }
-        .descripcion-datos, .nota-datos { color: #cbd5e1; line-height: 1.5; }
-        .descripcion-datos { margin-bottom: 18px; }
-        .nota-datos { margin-top: 16px; font-size: 0.9rem; }
-        .tabla-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 15px; }
-        .datos-gemini table { width: 100%; min-width: 520px; border-collapse: collapse; background: rgba(255, 255, 255, 0.05); }
-        .datos-gemini caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-        .datos-gemini th, .datos-gemini td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.12); text-align: left; }
-        .datos-gemini th { color: #38bdf8; background: rgba(15,23,42,0.58); font-weight: 750; }
-        .datos-gemini tbody tr:hover { background: rgba(56,189,248,0.08); }
-        .datos-gemini tbody tr:last-child td { border-bottom: 0; }
-
     </style>
 </head>
 
@@ -405,37 +380,6 @@
 
         <section id="agenda" class="agenda"></section>
 
-        <!-- Listado HTML estático para asistentes que no ejecutan JavaScript -->
-        <section class="datos-gemini" id="listado-cumpleanos" aria-labelledby="titulo-listado-cumpleanos">
-            <h2 id="titulo-listado-cumpleanos">📋 Listado de cumpleaños</h2>
-            <p class="descripcion-datos">Fechas de nacimiento utilizadas por la agenda para calcular edades y próximos cumpleaños.</p>
-            <div class="tabla-responsive">
-                <table>
-                    <caption>Listado estático de nombres y fechas de nacimiento</caption>
-                    <thead><tr><th scope="col">Nombre</th><th scope="col">Fecha de nacimiento</th></tr></thead>
-                    <tbody>
-                        <tr><td>Pablo Fernando</td><td><time datetime="1979-11-09">9 de noviembre de 1979</time></td></tr>
-                        <tr><td>Ernesto Fabian</td><td><time datetime="1981-01-31">31 de enero de 1981</time></td></tr>
-                        <tr><td>Gustavo Fabian</td><td><time datetime="1983-07-04">4 de julio de 1983</time></td></tr>
-                        <tr><td>Mariana Soledad</td><td><time datetime="1989-12-26">26 de diciembre de 1989</time></td></tr>
-                        <tr><td>Florencia</td><td><time datetime="1956-10-27">27 de octubre de 1956</time></td></tr>
-                        <tr><td>Agustin</td><td><time datetime="2011-08-03">3 de agosto de 2011</time></td></tr>
-                        <tr><td>Pupu</td><td><time datetime="2018-08-09">9 de agosto de 2018</time></td></tr>
-                        <tr><td>July</td><td><time datetime="2013-10-09">9 de octubre de 2013</time></td></tr>
-                        <tr><td>Esteban</td><td><time datetime="2009-02-19">19 de febrero de 2009</time></td></tr>
-                        <tr><td>Marcos</td><td><time datetime="1981-12-09">9 de diciembre de 1981</time></td></tr>
-                        <tr><td>Emma</td><td><time datetime="2022-08-09">9 de agosto de 2022</time></td></tr>
-                        <tr><td>Bruno</td><td><time datetime="2012-11-18">18 de noviembre de 2012</time></td></tr>
-                        <tr><td>Lumi</td><td><time datetime="2010-08-26">26 de agosto de 2010</time></td></tr>
-                        <tr><td>Morena</td><td><time datetime="2011-01-26">26 de enero de 2011</time></td></tr>
-                        <tr><td>Tahiel</td><td><time datetime="2012-10-09">9 de octubre de 2012</time></td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <p class="nota-datos">Esta sección está escrita en HTML estático para que pueda consultarse sin ejecutar JavaScript.</p>
-        </section>
-
-
         <footer class="pie">
             La información se calcula usando la fecha y hora del dispositivo.
         </footer>
@@ -455,22 +399,71 @@
          */
 
 const personas = [
-            { nombre: "Pablo Fernando", nacimiento: "1979-11-09" },
-            { nombre: "Ernesto Fabian", nacimiento: "1981-01-31" },
-            { nombre: "Gustavo Fabian", nacimiento: "1983-07-04" },
-            { nombre: "Mariana Soledad", nacimiento: "1989-12-26" },
-            { nombre: "Florencia", nacimiento: "1956-10-27" },
-            { nombre: "Agustin", nacimiento: "2011-08-03" },
-            { nombre: "Pupu", nacimiento: "2018-08-09" },
-            { nombre: "July", nacimiento: "2013-10-09" },
-            { nombre: "Esteban", nacimiento: "2009-02-19" },
-            { nombre: "Marcos", nacimiento: "1981-12-09" },
-            { nombre: "Emma", nacimiento: "2022-08-09" },
-            { nombre: "Bruno", nacimiento: "2012-11-18" },
-            { nombre: "Lumi", nacimiento: "2010-08-26" },
-            { nombre: "Morena", nacimiento: "2011-01-26" },
-            { nombre: "Tahiel", nacimiento: "2012-10-09" }
-        ];
+    {
+        nombre: "Pablo Fernando",
+        nacimiento: "1979-11-09"
+    },
+    {
+        nombre: "Ernesto Fabian",
+        nacimiento: "1981-01-31"
+    },
+    {
+        nombre: "Gustavo Fabian",
+        nacimiento: "1983-07-04"
+    },
+    {
+        nombre: "Mariana Soledad",
+        nacimiento: "1989-12-26"
+    },
+    {
+        nombre: "Florencia",
+        nacimiento: "1956-10-27"
+    },
+    {
+        nombre: "Agustin",
+        nacimiento: "2011-08-03"
+    },
+    {
+        nombre: "Pupu",
+        nacimiento: "2018-08-09"
+    },
+    {
+        nombre: "July",
+        nacimiento: "2013-10-09"
+    },
+    {
+        nombre: "Esteban",
+        nacimiento: "2009-02-19"
+    },
+    {
+        nombre: "Marcos",
+        nacimiento: "1981-12-09"
+    },
+    {
+        nombre: "Raquel",
+        nacimiento: "19814-02-11"
+    },
+    {
+        nombre: "Emma",
+        nacimiento: "2022-08-09"
+    },
+    {
+        nombre: "Bruno",
+        nacimiento: "2012-11-18"
+    },
+    {
+        nombre: "Lumi",
+        nacimiento: "2010-08-26"
+    },
+    {
+        nombre: "Morena",
+        nacimiento: "2011-01-26"
+    },
+    {
+        nombre: "Tahiel",
+        nacimiento: "2012-10-09"
+    }
+];
         const nombresMeses = [
             "enero",
             "febrero",
